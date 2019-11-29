@@ -1,11 +1,10 @@
 package com.ldlywt.ffmpegstudy;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.ldlywt.ffmpegstudy.listener.MediaErrorListener;
 import com.yanzhenjie.permission.AndPermission;
@@ -14,7 +13,6 @@ import com.yanzhenjie.permission.runtime.Permission;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
-    File mMusicFile = new File(Environment.getExternalStorageDirectory(),"input.mp3");
     private Player mPlayer;
 
 
@@ -34,8 +32,11 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .start();
 
+        Utils.readRaw(this);
+
+        String path = new File(Environment.getExternalStorageDirectory(), "input.mp3").getAbsolutePath();
         mPlayer = new Player();
-        mPlayer.setDataSource(mMusicFile.getAbsolutePath());
+        mPlayer.setDataSource(path);
         mPlayer.setOnErrorListener(new MediaErrorListener() {
             @Override
             public void onError(int code, String msg) {
@@ -51,5 +52,9 @@ public class MainActivity extends AppCompatActivity {
                 mPlayer.play();
             }
         }).start());
+
+
     }
+
+
 }
