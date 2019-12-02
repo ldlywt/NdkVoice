@@ -1,5 +1,6 @@
 package com.ldlywt.ffmpegstudy;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -13,7 +14,7 @@ import com.yanzhenjie.permission.runtime.Permission;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
-    private Player mPlayer;
+    private NativeUtil mPlayer;
 
 
     @Override
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         Utils.readRaw(this);
 
         String path = new File(Environment.getExternalStorageDirectory(), "input.mp3").getAbsolutePath();
-        mPlayer = new Player();
+        mPlayer = new NativeUtil();
         mPlayer.setDataSource(path);
         mPlayer.setOnErrorListener(new MediaErrorListener() {
             @Override
@@ -46,12 +47,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        findViewById(R.id.play).setOnClickListener(view -> new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mPlayer.play();
-            }
-        }).start());
+        findViewById(R.id.play).setOnClickListener(view -> new Thread(() -> mPlayer.play()).start());
+        findViewById(R.id.change_voice).setOnClickListener(view -> startActivity(new Intent(this, ChangeVoiceActivity.class)));
 
 
     }

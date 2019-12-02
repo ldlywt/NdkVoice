@@ -9,9 +9,9 @@ import com.ldlywt.ffmpegstudy.listener.MediaErrorListener;
  * Created by hcDarren on 2019/6/15.
  * 音频播放器的逻辑处理类
  */
-public class Player {
+public class NativeUtil {
     static {
-        System.loadLibrary("play");
+        System.loadLibrary("voiceStudy");
     }
 
     /**
@@ -45,4 +45,6 @@ public class Player {
     }
 
     private native void playMusic(String url);
+
+    public static native void changeVoice(String path, int mode);
 }

@@ -18,32 +18,29 @@ import java.io.InputStream;
  */
 public class Utils {
     public static void readRaw(Context context) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    InputStream inputStream = context.getResources().openRawResource(R.raw.test);
-                    File file = new File(Environment.getExternalStorageDirectory().getPath(), "test.mp3");
-                    if (!file.exists()) {
-                        file.createNewFile();
-                    }
-                    FileOutputStream fileOutputStream = new FileOutputStream(file);
-                    byte[] buffer = new byte[10];
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    int len = 0;
-                    while ((len = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, len);
-                    }
-                    byte[] bs = outputStream.toByteArray();
-                    fileOutputStream.write(bs);
-                    outputStream.close();
-                    inputStream.close();
-                    fileOutputStream.flush();
-                    fileOutputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.i("getPath", e.getMessage());
+        new Thread(() -> {
+            try {
+                InputStream inputStream = context.getResources().openRawResource(R.raw.test);
+                File file = new File(Environment.getExternalStorageDirectory().getPath(), "test.mp3");
+                if (!file.exists()) {
+                    file.createNewFile();
                 }
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                byte[] buffer = new byte[10];
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                int len = 0;
+                while ((len = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, len);
+                }
+                byte[] bs = outputStream.toByteArray();
+                fileOutputStream.write(bs);
+                outputStream.close();
+                inputStream.close();
+                fileOutputStream.flush();
+                fileOutputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("getPath", e.getMessage());
             }
         }).start();
     }

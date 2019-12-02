@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 # 需要引入我们头文件,以这个配置的目录为基准
 include_directories(src/main/jniLibs/include)
+include_directories(src/main/jniLibs/include/inc)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -16,12 +17,12 @@ include_directories(src/main/jniLibs/include)
 LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/main/jniLibs/armeabi-v7a)
 
 # 指定源文件目录
-AUX_SOURCE_DIRECTORY(${CMAKE_SOURCE_DIR}/src/main/cpp SRC_LIST)
-# FILE(GLOB SRC_LIST "src/main/cpp/*.cpp")
+#AUX_SOURCE_DIRECTORY(${CMAKE_SOURCE_DIR}/src/main/cpp SRC_LIST)
+FILE(GLOB SRC_LIST "src/main/cpp/*.cpp")
 
 add_library(
         # Sets the name of the library.
-        play
+        voiceStudy
         # Sets the library as a shared library.
         SHARED
         # Provides a relative path to your source file(s).
@@ -35,7 +36,7 @@ add_library(
 
 target_link_libraries( # Specifies the target library.
         # 链接额外的 ffmpeg 的编译
-        play
+        voiceStudy
         # 编解码(最重要的库)
         avcodec-57
         # 设备信息
@@ -48,10 +49,13 @@ target_link_libraries( # Specifies the target library.
         avutil-55
         # 后期处理
         postproc-54
-        # 音频采样数据格式转换库
+        # 音频采样数据格式转换库L
         swresample-2
         # 视频像素数据格式转换
         swscale-4
+        # 变声lib
+        fmod
+        fmodL
         # 链接 android ndk 自带的一些库
         android
         # Links the target library to the log library
