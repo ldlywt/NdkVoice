@@ -46,9 +46,6 @@ void FFmpegPlay::play() {
 
     avformat_network_init();
 
-    AVFormatContext *avFormatContext = nullptr;
-
-
     /// 2
     int openInputCode = avformat_open_input(&avFormatContext, url, nullptr, nullptr);
     if ( openInputCode != 0) {
@@ -87,7 +84,7 @@ void FFmpegPlay::play() {
 
     /// 6 打开解码器
     //申请AVCodecContext内存
-    AVCodecContext *avCodecContext = avcodec_alloc_context3(avCodec);
+    avCodecContext = avcodec_alloc_context3(avCodec);
     //将AVCodecContext赋值
     if (avcodec_parameters_to_context(avCodecContext, avCodecParameters) < 0) {
         LOGI("error");
@@ -107,9 +104,9 @@ void FFmpegPlay::play() {
     enum AVSampleFormat in_sample_fmt = avCodecContext->sample_fmt;
     int in_sample_rate = avCodecContext->sample_rate;
 
-    SwrContext *swrContext = swr_alloc_set_opts(nullptr, out_ch_layout, out_sample_fmt,
-                                                out_sample_rate, in_ch_layout, in_sample_fmt,
-                                                in_sample_rate, 0, nullptr);
+    swrContext = swr_alloc_set_opts(nullptr, out_ch_layout, out_sample_fmt,
+                                    out_sample_rate, in_ch_layout, in_sample_fmt,
+                                    in_sample_rate, 0, nullptr);
     if (swrContext == nullptr) {
         LOGI("error");
     }
@@ -120,7 +117,7 @@ void FFmpegPlay::play() {
     int outChannels = av_get_channel_layout_nb_channels(out_ch_layout);
     int dataSize = av_samples_get_buffer_size(nullptr, outChannels,
                                               avCodecParameters->frame_size, out_sample_fmt, 0);
-    uint8_t *resampleOUtBuffer = (uint8_t *) malloc(dataSize);
+    resampleOutBuffer = (uint8_t *) malloc(dataSize);
     // ---------- 重采样 end ----------
 
     jbyteArray jPcmByteArray = jniCall->jniEnv->NewByteArray(dataSize);
@@ -139,14 +136,14 @@ void FFmpegPlay::play() {
                 if (codecReceiveFrameRes == 0) {
 
                     // 调用重采样的方法
-                    swr_convert(swrContext, &resampleOUtBuffer, avFrame->nb_samples,
+                    swr_convert(swrContext, &resampleOutBuffer, avFrame->nb_samples,
                                 (const uint8_t **) avFrame->data, avFrame->nb_samples);
 
                     // write 写到缓冲区 pFrame.data -> javabyte
                     // size 是多大，装 pcm 的数据
                     // 1s 44100 点  2通道 ，2字节    44100*2*2
                     // 1帧不是一秒，pFrame->nb_samples点
-                    memcpy(jPcmData, resampleOUtBuffer, dataSize);
+                    memcpy(jPcmData, resampleOutBuffer, dataSize);
                     // 0 把 c 的数组的数据同步到 jbyteArray , 然后释放native数组
                     jniCall->jniEnv->ReleaseByteArrayElements(jPcmByteArray, jPcmData, JNI_COMMIT);
                     // TODO

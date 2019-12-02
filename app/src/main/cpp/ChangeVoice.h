@@ -14,7 +14,18 @@
 #define MODE_KONGLING 5
 
 class ChangeVoice {
+public:
+    JNIEnv *env;
+    const char *url;
+    int mode;
+    FMOD::System *system;
+public:
+    ChangeVoice(JNIEnv *env, const char *url, int mode);
 
+    ~ChangeVoice();
+
+public:
+    void playVoice();
 };
 
 
