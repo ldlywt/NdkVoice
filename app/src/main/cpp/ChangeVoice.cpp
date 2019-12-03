@@ -1,9 +1,12 @@
 
 #include <jni.h>
-#include <inc/fmod.hpp>
 #include <unistd.h>
 #include "ChangeVoice.h"
 #include "Constant.h"
+#include <pthread.h>
+
+using namespace FMOD;
+using namespace std;
 
 ChangeVoice::ChangeVoice(JNIEnv *env, const char *url, int mode) {
     this->env = env;
@@ -16,14 +19,12 @@ ChangeVoice::~ChangeVoice() {
     system->release();
 }
 
-using namespace FMOD;
-
 void ChangeVoice::playVoice() {
     //初始化fmod
     FMOD::System_Create(&system);
     Sound *sound;
     // 通道（声音是由多种音效组成）
-    Channel *channel;
+    Channel *channel = nullptr;
     // 音频
     DSP *pDSP;
     // 速度
@@ -36,14 +37,14 @@ void ChangeVoice::playVoice() {
         switch (mode) {
             case MODE_NORMAL:
                 LOGI("%s", "正常");
-                system->playSound(sound, NULL, false, &channel);
+                system->playSound(sound, nullptr, false, &channel);
                 break;
             case MODE_DASHU:
                 LOGI("%s", "大叔");
                 // 设置音调，调低音调
                 system->createDSPByType(FMOD_DSP_TYPE_PITCHSHIFT, &pDSP);
                 pDSP->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, 0.7);
-                system->playSound(sound, NULL, false, &channel);
+                system->playSound(sound, nullptr, false, &channel);
                 channel->addDSP(0, pDSP);
                 break;
             case MODE_LUOLI:
@@ -51,13 +52,13 @@ void ChangeVoice::playVoice() {
                 // 设置音调，调高音调
                 system->createDSPByType(FMOD_DSP_TYPE_PITCHSHIFT, &pDSP);
                 pDSP->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, 3);
-                system->playSound(sound, NULL, false, &channel);
+                system->playSound(sound, nullptr, false, &channel);
                 channel->addDSP(0, pDSP);
                 break;
             case MODE_GAOGUAI:
                 LOGI("%s", "搞怪");
                 system->createDSPByType(FMOD_DSP_TYPE_NORMALIZE, &pDSP);
-                system->playSound(sound, NULL, false, &channel);
+                system->playSound(sound, nullptr, false, &channel);
                 channel->addDSP(0, pDSP);
                 // 获取速度并加速
                 channel->getFrequency(&frequency);
@@ -71,7 +72,7 @@ void ChangeVoice::playVoice() {
                 system->createDSPByType(FMOD_DSP_TYPE_TREMOLO, &pDSP);
                 // 设置颤抖的频率
                 pDSP->setParameterFloat(FMOD_DSP_TREMOLO_SKEW, 0.8);
-                system->playSound(sound, NULL, false, &channel);
+                system->playSound(sound, nullptr, false, &channel);
                 channel->addDSP(0, pDSP);
                 channel->getFrequency(&frequency);
                 frequency = frequency * 0.5;
@@ -84,7 +85,7 @@ void ChangeVoice::playVoice() {
                 // 设置重复的重复延迟
                 pDSP->setParameterFloat(FMOD_DSP_ECHO_DELAY, 300);
                 pDSP->setParameterFloat(FMOD_DSP_ECHO_FEEDBACK, 20);
-                system->playSound(sound, NULL, false, &channel);
+                system->playSound(sound, nullptr, false, &channel);
                 channel->addDSP(0, pDSP);
                 break;
         }
@@ -102,5 +103,19 @@ void ChangeVoice::playVoice() {
     }
 }
 
+
+//void *threadPlay(void *context) {
+//    ChangeVoice *pFFmpeg = (ChangeVoice *) context;
+//    pFFmpeg->playVoice();
+//    return 0;
+//}
+//
+//
+//void ChangeVoice::play() {
+//    // 创建一个线程去播放，多线程编解码边播放
+//    pthread_t playThreadT;
+//    pthread_create(&playThreadT, NULL, threadPlay, this);
+//    pthread_detach(playThreadT);
+//}
 
 
