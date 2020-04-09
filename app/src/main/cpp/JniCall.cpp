@@ -32,6 +32,7 @@ void JniCall::initCreateAudioTrack() {
                                        sampleRateInHz, channelConfig, audioFormat, bufferSizeInBytes, mode);
 
     jmethodID playMid = jniEnv->GetMethodID(jAudioTrackClass,"play","()V");
+    jAudioTrackPause = jniEnv->GetMethodID(jAudioTrackClass,"pause","()V");
     jniEnv->CallVoidMethod(jAudioTrackObj,playMid);
 
     jAudioTrackWriteMid = jniEnv->GetMethodID(jAudioTrackClass,"write","([BII)I");
@@ -39,6 +40,10 @@ void JniCall::initCreateAudioTrack() {
 
 void JniCall::callAudioTrackWrite(jbyteArray audioData, int offsetInBytes, int sizeInBytes) {
     jniEnv->CallIntMethod(jAudioTrackObj,jAudioTrackWriteMid,audioData,offsetInBytes,sizeInBytes);
+}
+
+void JniCall::pause() {
+    jniEnv->CallVoidMethod(jAudioTrackObj,jAudioTrackPause);
 }
 
 JniCall::~JniCall() {

@@ -1,8 +1,10 @@
-package com.ldlywt.ffmpegstudy;
+package com.ldlywt.ffmpegstudy.utils;
 
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+
+import com.ldlywt.ffmpegstudy.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,7 +18,7 @@ import java.io.InputStream;
  * desc   :
  * version: 1.0
  */
-public class Utils {
+public class RawUtils {
     public static void readRaw(Context context) {
         new Thread(() -> {
             try {

@@ -4,13 +4,22 @@
 
 #include "FFmpegPlay.h"
 
-FFmpegPlay::FFmpegPlay(JniCall *jniCall, const char *url) {
+FFmpegPlay::FFmpegPlay(JniCall *jniCall) {
     this->jniCall = jniCall;
-    this->url = url;
 }
 
 FFmpegPlay::~FFmpegPlay() {
     release();
+}
+
+void *prepare_t(void *args) {
+    FFmpegPlay *play = static_cast<FFmpegPlay *>(args);
+//    play->
+}
+
+
+void FFmpegPlay::prepare() {
+    pthread_create(&prepareTask, nullptr, prepare_t, this);
 }
 
 void FFmpegPlay::release() {
@@ -48,8 +57,8 @@ void FFmpegPlay::play() {
 
     /// 2
     int openInputCode = avformat_open_input(&avFormatContext, url, nullptr, nullptr);
-    if ( openInputCode != 0) {
-        LOGI("步骤二失败");
+    if (openInputCode != 0) {
+        LOGI("打开%s 失败，返回:%d 错误描述:%s", url, openInputCode, av_err2str(openInputCode));
         callPlayerJniError(openInputCode, av_err2str(openInputCode));
         return;
     }
@@ -178,6 +187,14 @@ void FFmpegPlay::callPlayerJniError(int code, char *msg) {
 
 }
 
-void FFmpegPlay::prepare() {
+
+void FFmpegPlay::pause() {
+    jniCall->pause();
 
 }
+
+void FFmpegPlay::setDataSource(const char *path_) {
+    url = new char[strlen(path_) + 1];
+    strcpy(url, path_);
+}
+

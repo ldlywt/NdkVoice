@@ -19,6 +19,12 @@ public class NativeUtil {
      */
     private String url;
 
+    public NativeUtil() {
+        this.nativeHandle = nativeInit();
+    }
+
+    private final long nativeHandle;
+
     private MediaErrorListener mErrorListener;
 
     public void setOnErrorListener(MediaErrorListener mErrorListener) {
@@ -41,10 +47,25 @@ public class NativeUtil {
             throw new NullPointerException("url is null, please call method setDataSource");
         }
 
-        playMusic(url);
+        playMusic(nativeHandle, url);
     }
 
-    private native void playMusic(String url);
+    public void pause() {
+
+    }
+
+    public void stop() {
+
+    }
+
+
+    private native long nativeInit();
+
+    private native void prepare(long nativeHandle);
+
+    private native void playMusic(long nativeHandle, String url);
+
+    public native void pauseMusic();
 
     public static native void changeVoice(String path, int mode);
 }

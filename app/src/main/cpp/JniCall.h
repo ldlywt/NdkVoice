@@ -13,6 +13,7 @@ class JniCall {
 public:
     jobject jAudioTrackObj;
     jmethodID jAudioTrackWriteMid;
+    jmethodID jAudioTrackPause;
     JavaVM *javaVm;
     JNIEnv *jniEnv;
     jmethodID jPlayerErrorMid;
@@ -29,6 +30,7 @@ private:
 public:
     void callAudioTrackWrite(jbyteArray audioData, int offsetInBytes, int sizeInBytes);
     void callPlayerError(int code, char *msg);
+    void pause();
 };
 
 

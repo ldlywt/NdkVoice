@@ -14,26 +14,36 @@ extern "C" {
 
 class FFmpegPlay {
 public:
+
     AVFormatContext *avFormatContext = nullptr;
     AVCodecContext *avCodecContext = nullptr;
     SwrContext *swrContext = nullptr;
     uint8_t *resampleOutBuffer = nullptr;
-    const char *url = nullptr;
     JniCall *jniCall = nullptr;
 
 public:
-    FFmpegPlay(JniCall *jniCall, const char *url);
+
+    FFmpegPlay(JniCall *jniCall);
 
     ~FFmpegPlay();
 
 public:
+
+    void setDataSource(const char *path);
+
     void play();
+
+    void pause();
 
     void prepare();
 
     void callPlayerJniError(int code, char *url);
 
     void release();
+
+private:
+    pthread_t prepareTask;
+    char *url;
 
 };
 
