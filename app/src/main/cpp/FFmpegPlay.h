@@ -13,6 +13,8 @@ extern "C" {
 };
 
 class FFmpegPlay {
+    friend void *prepare_t(void *args);
+
 public:
 
     AVFormatContext *avFormatContext = nullptr;
@@ -37,7 +39,7 @@ public:
 
     void prepare();
 
-    void callPlayerJniError(int code, char *url);
+    void callPlayerJniError(int code, char *url,int thread);
 
     void release();
 
@@ -45,6 +47,7 @@ private:
     pthread_t prepareTask;
     char *url;
 
+    void _prepare();
 };
 
 

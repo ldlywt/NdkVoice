@@ -11,6 +11,11 @@
 
 #define AUDIO_SAMPLE_RATE 44100
 
+
+//标记线程 因为子线程需要attach
+#define THREAD_MAIN 1
+#define THREAD_CHILD 2
+
 // ---------- 播放错误码 start ----------
 #define FIND_STREAM_ERROR_CODE -0x10
 #define CODEC_FIND_DECODER_ERROR_CODE -0x11

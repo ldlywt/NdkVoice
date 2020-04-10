@@ -9,6 +9,9 @@
 #include <jni.h>
 #include "Constant.h"
 
+
+
+
 class JniCall {
 public:
     jobject jAudioTrackObj;
@@ -17,20 +20,28 @@ public:
     JavaVM *javaVm;
     JNIEnv *jniEnv;
     jmethodID jPlayerErrorMid;
+    jmethodID jPlayerPrepareMid;
+    jmethodID jPlayerProgressMid;
     jobject jPlayerObj;
 
 public:
-    JniCall(JavaVM *javaVm, JNIEnv *jniEnv,jobject jPlayerObj);
+    JniCall(JavaVM *javaVm, JNIEnv *jniEnv, jobject &_jObject);
 
     ~JniCall();
+
+    void callAudioTrackWrite(jbyteArray audioData, int offsetInBytes, int sizeInBytes);
+
+    void callError(int code, char *msg,int thread = THREAD_MAIN);
+
+    void pause();
+
+    void onPrepare(int thread = THREAD_MAIN);
+
+    void onProgress(int progress,int thread = THREAD_MAIN);
 
 private:
     void initCreateAudioTrack();
 
-public:
-    void callAudioTrackWrite(jbyteArray audioData, int offsetInBytes, int sizeInBytes);
-    void callPlayerError(int code, char *msg);
-    void pause();
 };
 
 

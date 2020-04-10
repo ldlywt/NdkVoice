@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ldlywt.ffmpegstudy.utils.PermissionHelper
 import com.ldlywt.ffmpegstudy.utils.PermissionHelper.PermissionListener
-import com.ldlywt.ffmpegstudy.utils.RawUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -18,23 +17,22 @@ class MainActivity : AppCompatActivity() {
     private var mPlayer: NativeUtil? = null
     private var mHelper: PermissionHelper? = null
 
+    var mMusicFile = File(Environment.getExternalStorageDirectory(), "NoSpeak.mp3")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         requestPermission()
-        var filepath = ""
-        RawUtils.readRaw(this);
-        val path = File(Environment.getExternalStorageDirectory(), "test.mp3").absolutePath
         mPlayer = NativeUtil()
-        mPlayer!!.setDataSource(path)
+        mPlayer!!.setDataSource(mMusicFile.absolutePath)
         mPlayer!!.setOnErrorListener { code, msg ->
             Log.e("TAG", "error code: $code")
             Log.e("TAG", "error msg: $msg")
         }
         play.setOnClickListener {
+            mPlayer!!.play()
             Thread(Runnable {
 //                mPlayer!!.prepare()
-                mPlayer!!.play()
             }).start()
         }
 

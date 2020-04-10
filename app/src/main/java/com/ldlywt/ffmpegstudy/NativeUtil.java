@@ -2,8 +2,6 @@ package com.ldlywt.ffmpegstudy;
 
 import android.text.TextUtils;
 
-import com.ldlywt.ffmpegstudy.listener.MediaErrorListener;
-
 
 /**
  * Created by hcDarren on 2019/6/15.
@@ -25,17 +23,10 @@ public class NativeUtil {
 
     private final long nativeHandle;
 
-    private MediaErrorListener mErrorListener;
+    private OnErrorListener mErrorListener;
 
-    public void setOnErrorListener(MediaErrorListener mErrorListener) {
+    public void setOnErrorListener(OnErrorListener mErrorListener) {
         this.mErrorListener = mErrorListener;
-    }
-
-    // called from jni
-    private void onError(int code, String msg) {
-        if (mErrorListener != null) {
-            mErrorListener.onError(code, msg);
-        }
     }
 
     public void setDataSource(String url) {
@@ -47,7 +38,7 @@ public class NativeUtil {
             throw new NullPointerException("url is null, please call method setDataSource");
         }
 
-        playMusic(nativeHandle, url);
+        playMusic(url,nativeHandle);
     }
 
     public void pause() {
@@ -63,9 +54,47 @@ public class NativeUtil {
 
     private native void prepare(long nativeHandle);
 
-    private native void playMusic(long nativeHandle, String url);
+    private native void playMusic(String url,long nativeHandle);
 
     public native void pauseMusic();
 
     public static native void changeVoice(String path, int mode);
+
+
+    //--------------------called from jni---------------------
+    private void onError(int code, String msg) {
+        if (mErrorListener != null) {
+            mErrorListener.onError(code, msg);
+        }
+    }
+
+
+    private void onPrepare() {
+        if (null != onPrepareListener) {
+            onPrepareListener.onPrepared();
+        }
+    }
+
+    private void onProgress(int progress) {
+        if (null != onProgressListener) {
+            onProgressListener.onProgress(progress);
+        }
+    }
+
+    private OnErrorListener onErrorListener;
+    private OnProgressListener onProgressListener;
+    private OnPrepareListener onPrepareListener;
+
+
+    public interface OnErrorListener {
+        void onError(int code, String msg);
+    }
+
+    public interface OnPrepareListener {
+        void onPrepared();
+    }
+
+    public interface OnProgressListener {
+        void onProgress(int progress);
+    }
 }

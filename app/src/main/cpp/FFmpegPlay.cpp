@@ -14,7 +14,11 @@ FFmpegPlay::~FFmpegPlay() {
 
 void *prepare_t(void *args) {
     FFmpegPlay *play = static_cast<FFmpegPlay *>(args);
-//    play->
+    play->play();
+    return 0;
+}
+
+void FFmpegPlay::_prepare() {
 }
 
 
@@ -50,24 +54,31 @@ void FFmpegPlay::release() {
 }
 
 void FFmpegPlay::play() {
-    ///1
+
+    if (jniCall->javaVm->AttachCurrentThread(&(jniCall->jniEnv), 0) != JNI_OK) {
+        return;
+    }
+
+    ///1 注册
     av_register_all();
 
     avformat_network_init();
 
-    /// 2
+    avFormatContext = avformat_alloc_context();
+
+    /// 2 打开媒体问题
     int openInputCode = avformat_open_input(&avFormatContext, url, nullptr, nullptr);
     if (openInputCode != 0) {
         LOGI("打开%s 失败，返回:%d 错误描述:%s", url, openInputCode, av_err2str(openInputCode));
-        callPlayerJniError(openInputCode, av_err2str(openInputCode));
+        callPlayerJniError(openInputCode, av_err2str(openInputCode), THREAD_CHILD);
         return;
     }
 
 
-
-    /// 3
+    /// 3 查找媒体流
     if (avformat_find_stream_info(avFormatContext, nullptr) < 0) {
-        LOGI("步骤三失败");
+        LOGI("步骤三失败打开查找媒体流失败，返回:%d 错误描述:%s", openInputCode, av_err2str(openInputCode));
+        callPlayerJniError(openInputCode, av_err2str(openInputCode), THREAD_CHILD);
         return;
     }
 
@@ -177,13 +188,13 @@ void FFmpegPlay::play() {
     // 解除 jPcmDataArray 的持有，让 javaGC 回收
     jniCall->jniEnv->ReleaseByteArrayElements(jPcmByteArray, jPcmData, 0);
     jniCall->jniEnv->DeleteLocalRef(jPcmByteArray);
-
+    jniCall->javaVm->DetachCurrentThread();
 }
 
-void FFmpegPlay::callPlayerJniError(int code, char *msg) {
+void FFmpegPlay::callPlayerJniError(int code, char *msg, int thread = THREAD_MAIN) {
     release();
     // 回调给 java 层调用
-    jniCall->callPlayerError(code, msg);
+    jniCall->callError(code, msg, thread);
 
 }
 
